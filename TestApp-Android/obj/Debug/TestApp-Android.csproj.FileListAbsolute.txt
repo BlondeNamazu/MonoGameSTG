@@ -40,5 +40,5 @@ c:\users\Public\documents\visual studio 2015\Projects\TestApp\TestApp-Android\ob
 c:\users\Public\documents\visual studio 2015\Projects\TestApp\TestApp-Android\obj\Debug\android\assets\System.Xml.dll.mdb
 c:\users\Public\documents\visual studio 2015\Projects\TestApp\TestApp-Android\obj\Debug\android\assets\System.Xml.Linq.dll.mdb
 c:\users\Public\documents\visual studio 2015\Projects\TestApp\TestApp-Android\obj\Debug\android\assets\TestApp-Android.dll.mdb
-c:\users\Public\documents\visual studio 2015\Projects\TestApp\TestApp-Android\obj\Debug\TestApp-Android.dll.mdb
-c:\users\Public\documents\visual studio 2015\Projects\TestApp\TestApp-Android\bin\Android\AnyCPU\Debug\TestApp-Android.dll.mdb
+C:\Users\Public\Documents\visual studio 2015\Projects\TestApp\TestApp-Android\obj\Debug\TestApp-Android.dll.mdb
+C:\Users\Public\Documents\visual studio 2015\Projects\TestApp\TestApp-Android\bin\Android\AnyCPU\Debug\TestApp-Android.dll.mdb

@@ -12,6 +12,7 @@ namespace SharedProject
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Texture2D myship;
 
         public Game1()
         {
@@ -47,6 +48,7 @@ namespace SharedProject
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+            myship = Content.Load<Texture2D>("myship");
         }
 
         /// <summary>
@@ -80,7 +82,9 @@ namespace SharedProject
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             // TODO: Add your drawing code here
-
+            spriteBatch.Begin();
+            spriteBatch.Draw(myship, new Rectangle(0, 0, myship.Width, myship.Height), Color.White);
+            spriteBatch.End();
             base.Draw(gameTime);
         }
     }
