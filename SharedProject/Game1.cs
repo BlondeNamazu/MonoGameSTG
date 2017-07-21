@@ -8,21 +8,28 @@ namespace SharedProject
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
+    
     public class Game1 : Game
     {
+        public static Game1 Instance { get; private set; }
+        public static Viewport Viewport { get { return Instance.GraphicsDevice.Viewport; } }
+        public static Vector2 ScreenSize { get { return new Vector2(Viewport.Width, Viewport.Height); } }
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Texture2D myship;
+        int width, height;
+        float dp;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
-            graphics.IsFullScreen = false;
-            graphics.PreferredBackBufferWidth = 800;
-            graphics.PreferredBackBufferHeight = 480;
-            graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+            graphics.PreferredBackBufferWidth = 360;
+            graphics.PreferredBackBufferHeight = 640;
+#if ANDROID
+            graphics.IsFullScreen = true;
+            graphics.SupportedOrientations = DisplayOrientation.Portrait;
+#endif
         }
 
         /// <summary>
@@ -35,6 +42,7 @@ namespace SharedProject
         {
             // TODO: Add your initialization logic here
 
+            Instance = this;
             base.Initialize();
         }
 
@@ -82,9 +90,17 @@ namespace SharedProject
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             // TODO: Add your drawing code here
+
+            dp = ScreenSize.Y / 20;
+            float magnification = dp / 64;
+            width = (int)ScreenSize.X;
+            height = (int)ScreenSize.Y;
+            Console.WriteLine("width :" + width + " height :" + height);
+            Rectangle rect = new Rectangle(width/2- (int)(myship.Width*magnification/2), height*4/5- (int)(myship.Height*magnification/2), (int)(myship.Width*magnification), (int)(myship.Height*magnification));
             spriteBatch.Begin();
-            spriteBatch.Draw(myship, new Rectangle(0, 0, myship.Width, myship.Height), Color.White);
+            spriteBatch.Draw(myship, rect, Color.White);
             spriteBatch.End();
+            //Console.WriteLine(rect.ToString());
             base.Draw(gameTime);
         }
     }
