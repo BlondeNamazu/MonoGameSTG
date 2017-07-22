@@ -16,8 +16,9 @@ namespace SharedProject
         public static Vector2 ScreenSize { get { return new Vector2(Viewport.Width, Viewport.Height); } }
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Input input;
         Texture2D myship;
-        int width, height;
+        int x, y;
         float dp;
 
         public Game1()
@@ -43,6 +44,14 @@ namespace SharedProject
             // TODO: Add your initialization logic here
 
             Instance = this;
+            x = (int)ScreenSize.X / 2;
+            y = (int)ScreenSize.Y * 4 / 5;
+#if ANDROID
+            input = new Input_Android();
+#elif WINDOWS
+            input = new Input_Windows();
+#endif
+            input.Init();
             base.Initialize();
         }
 
@@ -79,6 +88,7 @@ namespace SharedProject
                 Exit();
 
             // TODO: Add your update logic here
+            input.Update();
             base.Update(gameTime);
         }
 
@@ -93,12 +103,15 @@ namespace SharedProject
 
             dp = ScreenSize.Y / 20;
             float magnification = dp / 64;
-            width = (int)ScreenSize.X;
-            height = (int)ScreenSize.Y;
-            Console.WriteLine("width :" + width + " height :" + height);
-            Rectangle rect = new Rectangle(width/2- (int)(myship.Width*magnification/2), height*4/5- (int)(myship.Height*magnification/2), (int)(myship.Width*magnification), (int)(myship.Height*magnification));
+            x = (int)ScreenSize.X / 2 + (int)input.vec.X;
+            y = (int)ScreenSize.Y * 4 / 5 + (int)input.vec.Y;
+            if (x < myship.Width * magnification / 2) x = (int)(myship.Width * magnification / 2);
+            if (x > ScreenSize.X - myship.Width * magnification / 2) x = (int)(ScreenSize.X - myship.Width * magnification / 2);
+            if (y < myship.Height * magnification / 2) y = (int)(myship.Height * magnification / 2);
+            if (y > ScreenSize.Y - myship.Height * magnification / 2) y = (int)(ScreenSize.Y - myship.Height * magnification / 2);
+            Rectangle rect = new Rectangle(x- (int)(myship.Width*magnification/2), y- (int)(myship.Height*magnification/2), (int)(myship.Width*magnification), (int)(myship.Height*magnification));
             spriteBatch.Begin();
-            spriteBatch.Draw(myship, rect, Color.White);
+            spriteBatch.Draw(myship, rect, input.isTouched?Color.Red:Color.White);
             spriteBatch.End();
             //Console.WriteLine(rect.ToString());
             base.Draw(gameTime);

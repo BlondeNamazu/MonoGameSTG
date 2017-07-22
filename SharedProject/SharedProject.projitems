@@ -10,5 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Game1.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Input.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Input_Android.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Input_Windows.cs" />
   </ItemGroup>
 </Project>
