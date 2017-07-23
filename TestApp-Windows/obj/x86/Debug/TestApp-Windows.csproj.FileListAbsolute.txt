@@ -27,3 +27,4 @@ C:\Users\Public\Documents\visual studio 2015\Projects\TestApp\TestApp-Windows\bi
 C:\Users\Public\Documents\visual studio 2015\Projects\TestApp\TestApp-Windows\bin\Windows\x86\Debug\Content\enemy.xnb
 C:\Users\Public\Documents\visual studio 2015\Projects\TestApp\TestApp-Windows\bin\Windows\x86\Debug\Content\myship.xnb
 C:\Users\Public\Documents\visual studio 2015\Projects\TestApp\TestApp-Windows\bin\Windows\x86\Debug\Content\test.xnb
+C:\Users\Public\Documents\visual studio 2015\Projects\TestApp\TestApp-Windows\bin\Windows\x86\Debug\Content\Font.xnb

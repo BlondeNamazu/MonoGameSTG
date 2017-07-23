@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 
 namespace SharedProject
 {
@@ -16,10 +17,16 @@ namespace SharedProject
         public static Vector2 ScreenSize { get { return new Vector2(Viewport.Width, Viewport.Height); } }
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        SpriteFont font;
         Input input;
-        Texture2D myship;
-        int x, y;
+        Texture2D myship,bullet,enemy;
+        List<Bullet> bulletList;
+        Vector2 myshipPos;
+        float timer;
+        int bulletTimer;
+        int enemyLife;
         float dp;
+        private bool wasTouched;
 
         public Game1()
         {
@@ -44,15 +51,25 @@ namespace SharedProject
             // TODO: Add your initialization logic here
 
             Instance = this;
-            x = (int)ScreenSize.X / 2;
-            y = (int)ScreenSize.Y * 4 / 5;
 #if ANDROID
             input = new Input_Android();
 #elif WINDOWS
             input = new Input_Windows();
 #endif
-            input.Init();
             base.Initialize();
+            newGame();
+        }
+
+        private void newGame()
+        {
+            input.Init();
+            myshipPos.X = ScreenSize.X / 2;
+            myshipPos.Y = ScreenSize.Y * 4 / 5;
+            timer = 0;
+            bulletTimer = 10;
+            bulletList = new List<Bullet>();
+            enemyLife = 60;
+            wasTouched = false;
         }
 
         /// <summary>
@@ -66,6 +83,9 @@ namespace SharedProject
 
             // TODO: use this.Content to load your game content here
             myship = Content.Load<Texture2D>("myship");
+            enemy = Content.Load<Texture2D>("enemy");
+            bullet = Content.Load<Texture2D>("bullet");
+            font = Content.Load<SpriteFont>("Font");
         }
 
         /// <summary>
@@ -88,8 +108,23 @@ namespace SharedProject
                 Exit();
 
             // TODO: Add your update logic here
+            wasTouched = input.isTouched;
             input.Update();
             base.Update(gameTime);
+            if (enemyLife <= 0)
+            {
+                if (!wasTouched&&input.isTouched) newGame();
+                return;
+            }
+            timer += 0.01f;
+            bulletTimer--;
+            if(bulletTimer <= 0 && input.isTouched)
+            {
+                Bullet bul = new Bullet(myshipPos+new Vector2(0,-bullet.Width/2));
+                bulletList.Add(bul);
+                bulletTimer = 10;
+            }
+            foreach (Bullet bul in bulletList) bul.Update();
         }
 
         /// <summary>
@@ -103,17 +138,39 @@ namespace SharedProject
 
             dp = ScreenSize.Y / 20;
             float magnification = dp / 64;
-            x = (int)ScreenSize.X / 2 + (int)input.vec.X;
-            y = (int)ScreenSize.Y * 4 / 5 + (int)input.vec.Y;
-            if (x < myship.Width * magnification / 2) x = (int)(myship.Width * magnification / 2);
-            if (x > ScreenSize.X - myship.Width * magnification / 2) x = (int)(ScreenSize.X - myship.Width * magnification / 2);
-            if (y < myship.Height * magnification / 2) y = (int)(myship.Height * magnification / 2);
-            if (y > ScreenSize.Y - myship.Height * magnification / 2) y = (int)(ScreenSize.Y - myship.Height * magnification / 2);
-            Rectangle rect = new Rectangle(x- (int)(myship.Width*magnification/2), y- (int)(myship.Height*magnification/2), (int)(myship.Width*magnification), (int)(myship.Height*magnification));
+            if (enemyLife > 0)
+            {
+                myshipPos.X = ScreenSize.X / 2 + input.vec.X;
+                myshipPos.Y = ScreenSize.Y * 4 / 5 + input.vec.Y;
+            }
+            if (myshipPos.X < myship.Width * magnification / 2) myshipPos.X = (int)(myship.Width * magnification / 2);
+            if (myshipPos.X > ScreenSize.X - myship.Width * magnification / 2) myshipPos.X = (int)(ScreenSize.X - myship.Width * magnification / 2);
+            if (myshipPos.Y < myship.Height * magnification / 2) myshipPos.Y = (int)(myship.Height * magnification / 2);
+            if (myshipPos.Y > ScreenSize.Y - myship.Height * magnification / 2) myshipPos.Y = (int)(ScreenSize.Y - myship.Height * magnification / 2);
+            Rectangle rect = new Rectangle((int)myshipPos.X - (int)(myship.Width*magnification/2), (int)myshipPos.Y- (int)(myship.Height*magnification/2), (int)(myship.Width*magnification), (int)(myship.Height*magnification));
+
+            Vector2 enemyPos = new Vector2((float)(ScreenSize.X / 2 + ScreenSize.X / 4 * Math.Sin(4 * timer)), (float)(ScreenSize.Y / 4 + ScreenSize.Y / 6 * Math.Sin(5 * timer)));
+            Rectangle enemyRect = new Rectangle((int)enemyPos.X - (int)(enemy.Width * magnification / 2), (int)(enemyPos.Y) - (int)(enemy.Height * magnification / 2), (int)(enemy.Width * magnification), (int)(enemy.Height * magnification));
+
             spriteBatch.Begin();
-            spriteBatch.Draw(myship, rect, input.isTouched?Color.Red:Color.White);
+            for(int i=bulletList.Count-1;i>=0;i--)
+            {
+                Bullet bul = bulletList[i];
+                spriteBatch.Draw(bullet, new Rectangle((int)(bul.pos.X - bullet.Width*magnification), (int)(bul.pos.Y - bullet.Height*magnification), (int)(bullet.Width*magnification*2), (int)(bullet.Height*magnification*2)), Color.White);
+                if (bul.hitEnemy(enemyPos, 48 * magnification))
+                {
+                    enemyLife--;
+                    bulletList.Remove(bul);
+                    continue;
+                }
+                if (bul.pos.Y < -bullet.Height) bulletList.Remove(bul);
+            }
+            spriteBatch.Draw(myship, rect, Color.White);
+            if(enemyLife > 0)spriteBatch.Draw(enemy, enemyRect, Color.White);
+            String output = enemyLife != 0 ? enemyLife.ToString() : "Game Clear!";
+            Vector2 fontOrigin = font.MeasureString(output)/2;
+            spriteBatch.DrawString(font, output, new Vector2(ScreenSize.X/2,ScreenSize.Y/5), Color.White,0,fontOrigin,2.0f*magnification,SpriteEffects.None,0);
             spriteBatch.End();
-            //Console.WriteLine(rect.ToString());
             base.Draw(gameTime);
         }
     }
